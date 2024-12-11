@@ -1,6 +1,6 @@
 <?php
 
-require "./Strategy.php";
+require_once "./Strategy.php";
 
 class Allcooperate extends Strategy
 {
@@ -14,7 +14,7 @@ class Allcooperate extends Strategy
         $this->score += $value;
         return $this->score;
     }
-    public function play(array $history): bool
+    public function play(array $history, string $selfLabel ,string $opponentLabel): bool
     {
         $willCooperate = true;
         return $willCooperate;

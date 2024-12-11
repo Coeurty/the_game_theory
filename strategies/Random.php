@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-require "Strategy.php";
+require_once "Strategy.php";
 class Random extends Strategy
 {
 
@@ -15,7 +15,7 @@ class Random extends Strategy
         $this->score += $value;
         return $this->score;
     }
-    public function play(array $history): bool
+    public function play(array $history, string $selfLabel, string $opponentLabel): bool
     {
         $randomAction = rand(0, 1);
         if ($randomAction === 0) {
