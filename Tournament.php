@@ -1,32 +1,25 @@
 <?php
 require_once "./Strategy.php";
+require_once "./Payoffs.php";
+require_once "./Rules.php";
 
 class Tournament
 {
     private array $history = [];
     private Strategy $strategyA;
     private Strategy $strategyB;
-    private int $numberOfRounds;
-    private int $pointsMutualCooperation;
-    private int $pointsMutualCheat;
-    private int $pointsBetrayer;
-    private int $pointsBetrayed;
+    private Payoffs $payoffs;
+    private Rules $rules;
     public function __construct(
         Strategy $strategyA,
         Strategy $strategyB,
-        int $numberOfRounds,
-        int $pointsMutualCooperation,
-        int $pointsMutualCheat,
-        int $pointsBetrayer,
-        int $pointsBetrayed
+        Payoffs $payoffs,
+        Rules $rules,
     ) {
         $this->strategyA = $strategyA;
         $this->strategyB = $strategyB;
-        $this->numberOfRounds = $numberOfRounds;
-        $this->pointsMutualCooperation = $pointsMutualCooperation;
-        $this->pointsMutualCheat = $pointsMutualCheat;
-        $this->pointsBetrayer = $pointsBetrayer;
-        $this->pointsBetrayed = $pointsBetrayed;
+        $this->payoffs = $payoffs;
+        $this->rules = $rules;
     }
 
     private function newRound(bool $strategyACooperated, bool $strategyBCooperated): array
@@ -46,21 +39,21 @@ class Tournament
         echo PHP_EOL;
         if ($strategyACooperated && $strategyBCooperated) {
             echo "all coop";
-            $this->strategyA->updateScore($this->pointsMutualCooperation);
-            $this->strategyB->updateScore($this->pointsMutualCooperation);
+            $this->strategyA->updateScore($this->payoffs->getPointsMutualCooperation());
+            $this->strategyB->updateScore($this->payoffs->getPointsMutualCooperation());
         } elseif (!$strategyACooperated && !$strategyBCooperated) {
             echo "none coop";
-            $this->strategyA->updateScore($this->pointsMutualCheat);
-            $this->strategyB->updateScore($this->pointsMutualCheat);
+            $this->strategyA->updateScore($this->payoffs->getPointsMutualCheat());
+            $this->strategyB->updateScore($this->payoffs->getPointsMutualCheat());
         } else {
             if ($strategyACooperated) {
                 echo "a coop";
-                $this->strategyA->updateScore($this->pointsBetrayed);
-                $this->strategyB->updateScore($this->pointsBetrayer);
+                $this->strategyA->updateScore($this->payoffs->getPointsBetrayed());
+                $this->strategyB->updateScore($this->payoffs->getPointsBetrayer());
             } else {
                 echo "b coop";
-                $this->strategyA->updateScore($this->pointsBetrayer);
-                $this->strategyB->updateScore($this->pointsBetrayed);
+                $this->strategyA->updateScore($this->payoffs->getPointsBetrayer());
+                $this->strategyB->updateScore($this->payoffs->getPointsBetrayed());
             }
         }
         echo PHP_EOL;
@@ -77,7 +70,7 @@ class Tournament
 
     public function start(): void
     {
-        for ($i = 0; $i < $this->numberOfRounds; $i++) {
+        for ($i = 0; $i < $this->rules->getNumberOfRounds(); $i++) {
             $this->playARound();
         }
     }
