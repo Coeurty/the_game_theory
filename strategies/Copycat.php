@@ -17,14 +17,10 @@ class Copycat extends Strategy
     }
     public function play(array $history, string $selfLabel, string $opponentLabel): bool
     {
-        var_dump($history);
         if (empty($history)) {
             return true;
         }
         $lastRound = end($history);
-
-        $opponentLabel = ($selfLabel === 'strategyA') ? 'strategyB' : 'strategyA';
-
         return $lastRound[$opponentLabel];
     }
 }
