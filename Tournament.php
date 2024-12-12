@@ -5,64 +5,68 @@ require_once "./Rules.php";
 
 class Tournament
 {
-    private array $history = [];
-    private Strategy $strategyA;
-    private Strategy $strategyB;
+    private array $participants = [];
     private Payoffs $payoffs;
     private Rules $rules;
     public function __construct(
-        Strategy $strategyA,
-        Strategy $strategyB,
+        array $participants,
         Payoffs $payoffs,
         Rules $rules,
     ) {
-        $this->strategyA = $strategyA;
-        $this->strategyB = $strategyB;
+        $this->participants = $participants;
         $this->payoffs = $payoffs;
         $this->rules = $rules;
     }
 
     private function newRound(bool $strategyACooperated, bool $strategyBCooperated): array
     {
-        $newRound = [
+        return [
             "strategyA" => $strategyACooperated,
             "strategyB" => $strategyBCooperated,
         ];
-        return $newRound;
     }
 
-    public function playARound(): void
+    public function playMatch(Strategy $strategyA, Strategy $strategyB, array &$history)
     {
-        $strategyACooperated = $this->strategyA->play($this->history, "strategyA", "strategyB");
-        $strategyBCooperated = $this->strategyB->play($this->history, "strategyB", "strategyA");
+        $strategyACooperated = $strategyA->play($history, "strategyA", "strategyB");
+        $strategyBCooperated = $strategyB->play($history, "strategyB", "strategyA");
+
+        $strategyAName = $strategyA->getName();
+        $strategyBName = $strategyB->getName();
+        $strategyACooperatedToStr = $strategyACooperated ? "cooperated" : "cheated";
+        $strategyBCooperatedToStr = $strategyBCooperated ? "cooperated" : "cheated";
 
         echo PHP_EOL;
         if ($strategyACooperated && $strategyBCooperated) {
-            echo "all coop";
-            $this->strategyA->updateScore($this->payoffs->getPointsMutualCooperation());
-            $this->strategyB->updateScore($this->payoffs->getPointsMutualCooperation());
+            $strategyAPointsThisRound = $this->payoffs->getPointsMutualCooperation();
+            $strategyBPointsThisRound = $this->payoffs->getPointsMutualCooperation();
+            $strategyA->updateScore($strategyAPointsThisRound);
+            $strategyB->updateScore($strategyBPointsThisRound);
         } elseif (!$strategyACooperated && !$strategyBCooperated) {
-            echo "none coop";
-            $this->strategyA->updateScore($this->payoffs->getPointsMutualCheat());
-            $this->strategyB->updateScore($this->payoffs->getPointsMutualCheat());
+            $strategyAPointsThisRound = $this->payoffs->getPointsMutualCheat();
+            $strategyBPointsThisRound = $this->payoffs->getPointsMutualCheat();
+            $strategyA->updateScore($strategyAPointsThisRound);
+            $strategyB->updateScore($strategyBPointsThisRound);
         } else {
             if ($strategyACooperated) {
-                echo "a coop";
-                $this->strategyA->updateScore($this->payoffs->getPointsBetrayed());
-                $this->strategyB->updateScore($this->payoffs->getPointsBetrayer());
+                $strategyAPointsThisRound = $this->payoffs->getPointsBetrayed();
+                $strategyBPointsThisRound = $this->payoffs->getPointsBetrayer();
+                $strategyA->updateScore($strategyAPointsThisRound);
+                $strategyB->updateScore($strategyBPointsThisRound);
             } else {
-                echo "b coop";
-                $this->strategyA->updateScore($this->payoffs->getPointsBetrayer());
-                $this->strategyB->updateScore($this->payoffs->getPointsBetrayed());
+                $strategyAPointsThisRound = $this->payoffs->getPointsBetrayer();
+                $strategyBPointsThisRound = $this->payoffs->getPointsBetrayed();
+                $strategyA->updateScore($strategyAPointsThisRound);
+                $strategyB->updateScore($strategyBPointsThisRound);
             }
         }
         echo PHP_EOL;
-        echo "a:" . $strategyACooperated . " " . $this->strategyA->getScore() . PHP_EOL;
-        echo "b:" . $strategyBCooperated . " " . $this->strategyB->getScore();
+        echo "$strategyAName $strategyACooperatedToStr: +($strategyAPointsThisRound) | Total: " . $strategyA->getScore();
         echo PHP_EOL;
+        echo "$strategyBName $strategyBCooperatedToStr: +($strategyBPointsThisRound) | Total: " . $strategyB->getScore();
         echo PHP_EOL;
 
-        $this->history[] = $this->newRound(
+        $history[] = $this->newRound(
             $strategyACooperated,
             $strategyBCooperated
         );
@@ -70,17 +74,46 @@ class Tournament
 
     public function start(): void
     {
-        for ($i = 0; $i < $this->rules->getNumberOfRounds(); $i++) {
-            $this->playARound();
+        for ($i = 0; $i < 5; $i++) {
+            echo PHP_EOL;
+            echo "---- Pool $i start ----";
+            echo PHP_EOL;
+            $shuffledParticipants = $this->participants;
+            shuffle($shuffledParticipants);
+
+            for ($j = 0; $j < count($shuffledParticipants); $j += 2) {
+                $strategyA = $shuffledParticipants[$j];
+
+                $strategyB = null;
+                $strategyB = $shuffledParticipants[$j + 1];
+
+                if ($strategyB === null) {
+                    break;
+                }
+
+                $history = [];
+                echo PHP_EOL;
+                echo "-- Match start --";
+                for ($k = 0; $k < $this->rules->getNumberOfRounds(); $k++) {
+                    $this->playMatch($strategyA, $strategyB, $history);
+                }
+                echo PHP_EOL;
+                echo "-- Match end --";
+                echo PHP_EOL;
+            }
+            echo PHP_EOL;
+            echo "---- Pool end ----";
+            echo PHP_EOL;
         }
     }
 
     public function getResult()
     {
-        $result = [
-            "StrategyA" => $this->strategyA->getScore(),
-            "StrategyB" => $this->strategyB->getScore(),
-        ];
-        return $result;
+        echo PHP_EOL;
+        echo "---- Results ----";
+        foreach ($this->participants as $strategy) {
+            echo PHP_EOL;
+            echo $strategy->getName() . ":" . $strategy->getScore();
+        }
     }
 }
