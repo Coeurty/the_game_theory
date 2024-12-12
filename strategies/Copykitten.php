@@ -16,37 +16,21 @@ class Copykitten extends Strategy
         return $this->score;
     }
     public function play(array $history, string $selfLabel, string $opponentLabel): bool
-{
-    $cheatCountNeeded = 2;
-    $opponentCheats = 0;
-    $roundNumber = count($history);
-    
-    static $hasCheatedBack = false;
-  
-    if ($roundNumber === 0) {
-        return true; 
-    }
-   
-    foreach ($history as $round) {
-        if ($round[$opponentLabel] === false) {
-            $opponentCheats++;
-        } else {
-            $opponentCheats = 0; 
+    {
+        $roundNumber = count($history);
+
+        if ($roundNumber < 2) {
+            return true;
         }
-      
-        if ($opponentCheats >= $cheatCountNeeded && !$hasCheatedBack) {
-            $hasCheatedBack = true; 
+
+        $lastTwoRounds = array_slice($history, -2, 2);
+        $adversaryCheatedTwice = $lastTwoRounds[0][$opponentLabel] === false && $lastTwoRounds[1][$opponentLabel] === false;
+
+        if ($adversaryCheatedTwice) {
             return false;
         }
-    }
-   
-    if ($hasCheatedBack) {
-       
+        
         return true;
     }
-
-    return true;
-}
-
 
 }
