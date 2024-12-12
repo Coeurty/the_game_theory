@@ -4,7 +4,12 @@ require_once "./Strategy.php";
 
 class NeverCooperate extends Strategy
 {
+    private string $name = "NeverCooperate";
     private int $score = 0;
+    public function getName(): string
+    {
+        return $this->name;
+    }
     public function getScore(): int
     {
         return $this->score;

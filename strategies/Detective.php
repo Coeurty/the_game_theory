@@ -4,8 +4,12 @@ declare(strict_types=1);
 require_once "Strategy.php";
 class Detective extends Strategy
 {
-
+    private string $name = "Detective";
     private int $score = 0;
+    public function getName(): string
+    {
+        return $this->name;
+    }
     public function getScore(): int
     {
         return $this->score;
@@ -16,28 +20,28 @@ class Detective extends Strategy
         return $this->score;
     }
     public function play(array $history, string $selfLabel, string $opponentLabel): bool
-{ 
-    $initialSequence = [true, false, true, true];
-    $roundNumber = count($history);
+    {
+        $initialSequence = [true, false, true, true];
+        $roundNumber = count($history);
 
-    if ($roundNumber < count($initialSequence)) {
-        return $initialSequence[$roundNumber];
-    }
-
-    $opponentCheated = false;
-    foreach ($history as $round) {
-        if ($round[$opponentLabel] === false) {
-            $opponentCheated = true;
-            break; 
+        if ($roundNumber < count($initialSequence)) {
+            return $initialSequence[$roundNumber];
         }
-    }
 
-    if ($opponentCheated) {
-      
-        $lastRound = end($history);
-        return $lastRound[$opponentLabel]; 
-    }
+        $opponentCheated = false;
+        foreach ($history as $round) {
+            if ($round[$opponentLabel] === false) {
+                $opponentCheated = true;
+                break;
+            }
+        }
 
-    return false;
-}
+        if ($opponentCheated) {
+
+            $lastRound = end($history);
+            return $lastRound[$opponentLabel];
+        }
+
+        return false;
+    }
 }

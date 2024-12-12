@@ -4,8 +4,12 @@ declare(strict_types=1);
 require_once "Strategy.php";
 class Copykitten extends Strategy
 {
-
+    private string $name = "Copykitten";
     private int $score = 0;
+    public function getName(): string
+    {
+        return $this->name;
+    }
     public function getScore(): int
     {
         return $this->score;
@@ -29,7 +33,7 @@ class Copykitten extends Strategy
         if ($adversaryCheatedTwice) {
             return false;
         }
-        
+
         return true;
     }
 

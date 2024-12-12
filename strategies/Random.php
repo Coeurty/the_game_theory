@@ -4,8 +4,12 @@ declare(strict_types=1);
 require_once "Strategy.php";
 class Random extends Strategy
 {
-
+    private string $name = "Random";
     private int $score = 0;
+    public function getName(): string
+    {
+        return $this->name;
+    }
     public function getScore(): int
     {
         return $this->score;
