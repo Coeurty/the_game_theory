@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The game theory</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body>
@@ -61,7 +62,7 @@
         );
         $tournament1->start();
         ?>
-    </pre>
+    </pre>     
 </body>
 
 </html>
