@@ -4,24 +4,10 @@ require_once "./Strategy.php";
 
 class NeverCooperate extends Strategy
 {
-    private string $name = "NeverCooperate";
-    private int $score = 0;
-    public function getName(): string
+    protected string $name = "NeverCooperate";
+    public function playLogic(array $history, string $selfLabel, string $opponentLabel): bool
     {
-        return $this->name;
-    }
-    public function getScore(): int
-    {
-        return $this->score;
-    }
-    public function updateScore(int $value): int
-    {
-        $this->score += $value;
-        return $this->score;
-    }
-    public function play(array $history, string $selfLabel, string $opponentLabel): bool
-    {
-        $willNotCooperate = false;
-        return $willNotCooperate;
+        $willCooperate = false;
+        return $willCooperate;
     }
 }
