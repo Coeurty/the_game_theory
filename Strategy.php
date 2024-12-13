@@ -2,8 +2,34 @@
 
 abstract class Strategy
 {
-    abstract public function getName(): string;
-    abstract public function getScore(): int;
-    abstract public function updateScore(int $value): int;
-    abstract public function play(array $history, string $selfLabel, string $opponentLabel): bool;
+    protected string $name = "";
+    protected int $score = 0;
+    protected function applyChanceOfMistake(bool $willCooperate, int $chanceOfMistake): bool
+    {
+        $rand = rand(1, 100);
+        if ($rand < $chanceOfMistake) {
+            return !$willCooperate;
+        }
+        return $willCooperate;
+    }
+    public final function getName(): string
+    {
+        return $this->name;
+    }
+    public final function getScore(): int
+    {
+        return $this->score;
+    }
+    public final function updateScore(int $value): int
+    {
+        $this->score += $value;
+        return $this->score;
+    }
+    public final function play(array $history, int $chanceOfMistake, string $selfLabel, string $opponentLabel): bool
+    {
+        $willCooperate = $this->playLogic($history, $selfLabel, $opponentLabel);
+        return $this->applyChanceOfMistake($willCooperate, $chanceOfMistake);
+    }
+
+    abstract protected function playLogic(array $history, string $selfLabel, string $opponentLabel): bool;
 }

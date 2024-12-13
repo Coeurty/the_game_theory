@@ -28,8 +28,9 @@ class Tournament
 
     public function playMatch(Strategy $strategyA, Strategy $strategyB, array &$history)
     {
-        $strategyACooperated = $strategyA->play($history, "strategyA", "strategyB");
-        $strategyBCooperated = $strategyB->play($history, "strategyB", "strategyA");
+        $chanceOfMistake = $this->rules->getChanceOfMistake();
+        $strategyACooperated = $strategyA->play($history, $chanceOfMistake, "strategyA", "strategyB");
+        $strategyBCooperated = $strategyB->play($history, $chanceOfMistake, "strategyB", "strategyA");
 
         $strategyAName = $strategyA->getName();
         $strategyBName = $strategyB->getName();
