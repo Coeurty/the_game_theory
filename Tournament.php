@@ -72,38 +72,53 @@ class Tournament
         );
     }
 
+    private function replaceTheWorstWithTheBest(): void
+    {
+        usort($this->participants, fn($a, $b) => $a->getScore() - $b->getScore());
+
+        $numberOfReplacements = $this->rules->getNumberOfReplacement();
+        $bestParticipants = array_slice($this->participants, -$numberOfReplacements);
+        $this->participants = array_slice($this->participants, $numberOfReplacements);
+
+        foreach ($bestParticipants as $best) {
+            $this->participants[] = clone $best;
+        }
+    }
+
     public function start(): void
     {
-        for ($i = 0; $i < 5; $i++) {
+        for ($poolNb = 0; $poolNb < 10; $poolNb++) {
             echo PHP_EOL;
-            echo "---- Pool $i start ----";
+            echo "---- Pool $poolNb start ----";
             echo PHP_EOL;
-            $shuffledParticipants = $this->participants;
-            shuffle($shuffledParticipants);
+            $participants = $this->participants;
 
-            for ($j = 0; $j < count($shuffledParticipants); $j += 2) {
-                $strategyA = $shuffledParticipants[$j];
-
-                $strategyB = null;
-                $strategyB = $shuffledParticipants[$j + 1];
-
-                if ($strategyB === null) {
-                    break;
+            for ($i = 0; $i < count($participants); $i++) {
+                $participantA = $participants[$i];
+                for ($j = 0; $j < count($participants); $j++) {
+                    if ($i === $j) {
+                        continue;
+                    }
+                    $participantB = $participants[$j];
+                    $history = [];
+                    echo PHP_EOL;
+                    echo "-- Match start --";
+                    for ($k = 0; $k < $this->rules->getNumberOfRounds(); $k++) {
+                        $this->playMatch($participantA, $participantB, $history);
+                    }
+                    echo PHP_EOL;
+                    echo "-- Match end --";
+                    echo PHP_EOL;
                 }
 
-                $history = [];
-                echo PHP_EOL;
-                echo "-- Match start --";
-                for ($k = 0; $k < $this->rules->getNumberOfRounds(); $k++) {
-                    $this->playMatch($strategyA, $strategyB, $history);
-                }
-                echo PHP_EOL;
-                echo "-- Match end --";
-                echo PHP_EOL;
             }
+
+
             echo PHP_EOL;
             echo "---- Pool end ----";
             echo PHP_EOL;
+            $this->getResult();
+            $this->replaceTheWorstWithTheBest();
         }
     }
 
@@ -111,9 +126,11 @@ class Tournament
     {
         echo PHP_EOL;
         echo "---- Results ----";
+        usort($this->participants, fn($a, $b) => strcmp(get_class($a), get_class($b)));
         foreach ($this->participants as $strategy) {
             echo PHP_EOL;
             echo $strategy->getName() . ":" . $strategy->getScore();
         }
+        echo PHP_EOL;
     }
 }

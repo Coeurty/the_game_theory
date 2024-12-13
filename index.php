@@ -14,40 +14,52 @@
         require_once "./strategies/NeverCooperate.php";
         require_once "./strategies/Random.php";
         require_once "./strategies/Copycat.php";
+        require_once "./strategies/Copykitten.php";
         require_once "./strategies/Grudger.php";
+        require_once "./strategies/Detective.php";
+        require_once "./strategies/Simpleton.php";
         require_once "./Payoffs.php";
         require_once "./Rules.php";
         require_once "./Tournament.php";
 
-        $strat1 = new Allcooperate();
-        $strat2 = new NeverCooperate();
-        $strat3 = new Random();
-        $strat4 = new Copycat();
-        $strat5 = new Grudger();
-        
+        $participants = [
+            new NeverCooperate(),
+            new NeverCooperate(),
+            new Allcooperate(),
+            new Allcooperate(),
+            new Random(),
+            new Random(),
+            new Simpleton(),
+            new Simpleton(),
+            new Copykitten(),
+            new Copykitten(),
+            new Copycat(),
+            new Copycat(),
+            new Grudger(),
+            new Grudger(),
+            new Detective(),
+            new Detective(),
+        ];
+
         $payoffs1 = new Payoffs(
             3,
-            2,
+            1,
             5,
             0
         );
 
         $rules1 = new Rules(
-            rand(3, 7),
+            rand(10, 10),
             5,
             5
         );
 
         $tournament1 = new Tournament(
-            $strat3,
-            $strat5,
+            $participants,
             $payoffs1,
             $rules1
         );
         $tournament1->start();
-        $tournamentResult = $tournament1->getResult();
-        var_dump($tournamentResult);
-
         ?>
     </pre>
 </body>
