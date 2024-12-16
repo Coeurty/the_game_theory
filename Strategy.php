@@ -20,6 +20,10 @@ abstract class Strategy
     {
         return $this->score;
     }
+    public final function ResetScore(): void
+    {
+        $this->score = 0;
+    }
     public final function updateScore(int $value): int
     {
         $this->score += $value;

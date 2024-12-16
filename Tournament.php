@@ -5,6 +5,7 @@ require_once "./Rules.php";
 
 class Tournament
 {
+    private array $results = [];
     private array $participants = [];
     private Payoffs $payoffs;
     private Rules $rules;
@@ -32,12 +33,7 @@ class Tournament
         $strategyACooperated = $strategyA->play($history, $chanceOfMistake, "strategyA", "strategyB");
         $strategyBCooperated = $strategyB->play($history, $chanceOfMistake, "strategyB", "strategyA");
 
-        $strategyAName = $strategyA->getName();
-        $strategyBName = $strategyB->getName();
-        $strategyACooperatedToStr = $strategyACooperated ? "cooperated" : "cheated";
-        $strategyBCooperatedToStr = $strategyBCooperated ? "cooperated" : "cheated";
-
-        echo PHP_EOL;
+        // echo PHP_EOL;
         if ($strategyACooperated && $strategyBCooperated) {
             $strategyAPointsThisRound = $this->payoffs->getPointsMutualCooperation();
             $strategyBPointsThisRound = $this->payoffs->getPointsMutualCooperation();
@@ -61,11 +57,6 @@ class Tournament
                 $strategyB->updateScore($strategyBPointsThisRound);
             }
         }
-        echo PHP_EOL;
-        echo "$strategyAName $strategyACooperatedToStr: +($strategyAPointsThisRound) | Total: " . $strategyA->getScore();
-        echo PHP_EOL;
-        echo "$strategyBName $strategyBCooperatedToStr: +($strategyBPointsThisRound) | Total: " . $strategyB->getScore();
-        echo PHP_EOL;
 
         $history[] = $this->newRound(
             $strategyACooperated,
@@ -88,10 +79,8 @@ class Tournament
 
     public function start(): void
     {
+        $this->saveResult();
         for ($poolNb = 0; $poolNb < 10; $poolNb++) {
-            echo PHP_EOL;
-            echo "---- Pool $poolNb start ----";
-            echo PHP_EOL;
             $participants = $this->participants;
 
             for ($i = 0; $i < count($participants); $i++) {
@@ -102,36 +91,38 @@ class Tournament
                     }
                     $participantB = $participants[$j];
                     $history = [];
-                    echo PHP_EOL;
-                    echo "-- Match start --";
                     for ($k = 0; $k < $this->rules->getNumberOfRounds(); $k++) {
                         $this->playMatch($participantA, $participantB, $history);
                     }
-                    echo PHP_EOL;
-                    echo "-- Match end --";
-                    echo PHP_EOL;
                 }
-
             }
 
-
-            echo PHP_EOL;
-            echo "---- Pool end ----";
-            echo PHP_EOL;
-            $this->getResult();
+            $this->saveResult();
             $this->replaceTheWorstWithTheBest();
+            $this->resetScores();
         }
     }
 
-    public function getResult()
+    private function resetScores(): void
     {
-        echo PHP_EOL;
-        echo "---- Results ----";
+        foreach ($this->participants as $strategy)
+            $strategy->resetScore();
+    }
+
+    private function saveResult(): void
+    {
         usort($this->participants, fn($a, $b) => strcmp(get_class($a), get_class($b)));
-        foreach ($this->participants as $strategy) {
-            echo PHP_EOL;
-            echo $strategy->getName() . ":" . $strategy->getScore();
-        }
-        echo PHP_EOL;
+        $poolResult = array_map(function ($strategy) {
+            return [
+                "name" => $strategy->getName(),
+                "score" => $strategy->getScore()
+            ];
+        }, $this->participants);
+        $this->results[] = $poolResult;
+    }
+
+    public function getResult(): array
+    {
+        return $this->results;
     }
 }
