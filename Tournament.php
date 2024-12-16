@@ -80,7 +80,7 @@ class Tournament
     public function start(): void
     {
         $this->saveResult();
-        for ($poolNb = 0; $poolNb < 10; $poolNb++) {
+        for ($poolNb = 0; $poolNb < 30; $poolNb++) {
             $participants = $this->participants;
 
             for ($i = 0; $i < count($participants); $i++) {
@@ -97,8 +97,8 @@ class Tournament
                 }
             }
 
-            $this->saveResult();
             $this->replaceTheWorstWithTheBest();
+            $this->saveResult();
             $this->resetScores();
         }
     }

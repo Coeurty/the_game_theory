@@ -40,14 +40,14 @@ function buildHTMLResultSection(array $results): void
             $nextBtnDirection = $poolNb + 1;
             ?>
             <div class="turn" data-turncontainer="<?= $poolNb ?>" style="display: <?= $poolNb === 0 ? "flex;" : "none;" ?>">
-                <h2>Turn <?= $poolNb ?> result</h2>
-                <div class="btn-container">
+                <h2 class="text-3xl m-4">Turn <?= $poolNb ?> result</h2>
+                <div class="btn-container m-4">
                     <?php
                     if ($showPreviousBtn) {
-                        echo '<button data-toturn="' . $previousBtnDirection . '">Previous turn</button>';
+                        echo '<button class="p-4 bg-orange-700 text-white py-2 rounded-lg hover:bg-orange-700" data-toturn="' . $previousBtnDirection . '">Previous turn</button>';
                     }
                     if ($showNextBtn) {
-                        echo '<button data-toturn="' . $nextBtnDirection . '">Next turn</button>';
+                        echo '<button class="p-4 bg-orange-700 text-white py-2 rounded-lg hover:bg-orange-700" data-toturn="' . $nextBtnDirection . '">Next turn</button>';
                     }
                     ?>
                 </div>
